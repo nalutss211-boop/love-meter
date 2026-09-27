@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I Love You Heart</title>
+<style>
+  html, body { margin:0; height:100%; background:#000; overflow:hidden; }
+  canvas { display:block; width:100%; height:100%; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+<script>
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+
+function resize() {
+  canvas.width = window.innerWidth * devicePixelRatio;
+  canvas.height = window.innerHeight * devicePixelRatio;
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+resize();
+window.addEventListener('resize', resize);
+
+// 1. Hitung semua titik (pengganti loop turtle)
+const points = [];
+for (let scale = 11; scale < 17; scale++) {
+  for (let i = 0; i < 120; i++) {
+    const angle = (Math.PI * 2 * i) / 120;
+    const x = 16 * Math.pow(Math.sin(angle), 3) * scale;
+    const y = (13*Math.cos(angle) - 5*Math.cos(2*angle) - 2*Math.cos(3*angle) - Math.cos(4*angle)) * scale;
+    points.push({ x, y });
+  }
+}
+
+// 2. Gambar bertahap (pengganti t.goto + t.write)
+let drawn = 0;
+const perFrame = 1.2; // kecilkan untuk lebih pelan, besarkan untuk lebih cepat
+
+function frame() {
+  const w = window.innerWidth, h = window.innerHeight;
+  ctx.fillStyle = '#000';
+  ctx.fillRect(0, 0, w, h);
+
+  const cx = w / 2, cy = h / 2 + h * 0.05;
+  const fit = Math.min(w, h) / 420; // skala biar pas di layar HP
+
+  ctx.fillStyle = '#ffb6c1';
+  ctx.font = `${Math.max(8, 8 * fit)}px Arial`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+
+  const limit = Math.min(drawn, points.length);
+  for (let k = 0; k < limit; k++) {
+    const p = points[k];
+    const px = cx + p.x * fit;
+    const py = cy - p.y * fit;
+    ctx.fillText('I love you', px, py);
+  }
+
+  if (drawn < points.length) {
+    drawn += perFrame;
+    requestAnimationFrame(frame);
+  }
+}
+
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
